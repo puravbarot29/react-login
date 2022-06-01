@@ -1,19 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useOktaAuth } from '@okta/okta-react';
 
 
-function Header(){
-  return(
+function Header() {
+  const { oktaAuth, authState } = useOktaAuth();
+
+  const login = async () => { await oktaAuth.signInWithRedirect(); }
+  const logout = async () => { await oktaAuth.signOut(); }
+
+  const userText = authState.isAuthenticated
+    ? <button onClick={ logout }>Logout</button>
+    : <button onClick={ login }>Sign In</button>;
+
+  return (
     <header>
-      <div> Login into Purav's Demo</div>
+      <div>React Login</div>
       <ul className="menu">
-        <li><Link to="/"> Home </Link> </li>
-        <li><Link to="/private"> Private </Link></li>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/private">Private</Link></li>
       </ul>
+      {userText}
     </header>
   );
-
 }
-
 
 export default Header;
