@@ -9,10 +9,6 @@ import { LoginCallback, SecureRoute, Security } from '@okta/okta-react';
 import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js';
 import { useHistory } from 'react-router-dom';
 
-
-//Tutorial link: https://developer.okta.com/blog/2020/12/16/react-login#learn-more-about-react-and-authentication
-
-
 const oktaAuth = new OktaAuth({
   issuer: 'https://pbarot.okta.com/oauth2/default',
   clientId:'0oa18yy1eggfj8vac697',

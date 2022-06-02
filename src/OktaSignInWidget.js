@@ -1,68 +1,30 @@
 import React, { Component } from 'react';
-import { withOktaAuth } from '@okta/okta-react';
-import { OktaAuth } from '@okta/okta-auth-js';
+import OktaSignIn from '@okta/okta-signin-widget';
+import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 
-class OktaSignInWidget extends Component {
+export default class OktaSignInWidget extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      sessionToken: null,
-      email: '',
-      password: ''
-    };
-
-    this.oktaAuth = new OktaAuth({
-      issuer: props.baseUrl,
-      clientId: '0oa18yy1eggfj8vac697',
-      pkce: true
+    this.wrapper = React.createRef();
+  }
+  componentDidMount() {
+    this.widget = new OktaSignIn({
+      logo: '//logo.clearbit.com/okta.com',
+      idpDisplay: "SECONDARY",                        // Try: [PRIMARY, SECONDARY] Changes button display order
+      idps: [ {type: 'MICROSOFT', id: '0oa170psffBE5QrBj697'}],
+      //The property baseUrl is the URL of the application.
+      baseUrl: this.props.baseUrl,
+      redirectUri:'https://pbarot.okta.com/oauth2/v1/authorize/callback	'
     });
-
-    this.handleEmailChange = this.handleEmailChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.signIn = this.signIn.bind(this);
+    //callbacks that will be called when the login has been successful or when an error occurred.
+    this.widget.renderEl({el: this.wrapper.current}, this.props.onSuccess, this.props.onError);
   }
 
-  handleEmailChange(event) {
-    this.setState({email: event.target.value});
+  componentWillUnmount() {
+    this.widget.remove();
   }
 
-  handlePasswordChange(event) {
-    this.setState({password: event.target.value});
-  }
-
-  async signIn(event) {
-    event.preventDefault();
-    const transaction = await this.oktaAuth.signIn({
-      username: this.state.email,
-      password: this.state.password
-    });
-
-    if (transaction.status === 'SUCCESS') {
-      this.props.oktaAuth.signInWithRedirect({sessionToken: transaction.sessionToken})
-    } else {
-      throw new Error('Could not sign in: ' + transaction.status);
-    }
-  }
-
-//the render() function now returns its own form with Email and Password input elements
   render() {
-    return (
-      <form onSubmit={this.signIn} className="login-form">
-        <h2>Log In</h2>
-        <p>Please login to continue</p>
-        <label className="full-width-input">
-          Email
-          <input type="text" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} required />
-        </label>
-        <label className="full-width-input">
-          Password
-          <input type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} required autoComplete="off" />
-        </label>
-        <button className="button">Login</button>
-      </form>
-    );
+    return <div ref={this.wrapper} />;
   }
 };
-
-export default withOktaAuth(OktaSignInWidget);
